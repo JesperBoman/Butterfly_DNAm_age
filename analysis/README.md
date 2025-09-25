@@ -17,3 +17,7 @@ This pipeline randomly splits training+test data based on a particular seed and 
 master.clocksmith.sh runs smither.sh which in turn runs fancier_varying_seed_clock.R
 
 It is fancier_varying_seed_clock.R that is the script that is training the penalized regression model. The master.clocksmith and smither are used to parallelize the process without sending all jobs at once, to avoid sending too many concurrent jobs to a cluster.
+
+
+**GO prep**
+Also included are scripts that create files that can be used downstream for GO entology enrichment analysis.
