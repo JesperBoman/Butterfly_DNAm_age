@@ -181,7 +181,7 @@ ggplot(w.clock.dist.df, aes(x=age.average, y=(dist.max-dist.min)/2, col=SG))+geo
 #### Predictions ####
 pred.df <- read.table(file=file.choose())
 pred.df <- read.table(file="all.pred.CDS.dinuc.df")
-pred.df <- read.table(file="all.pred.varying_seed_dinuc_bigdata.comb.10.noW.MELD_DMRs_Only")
+#pred.df <- read.table(file="all.pred.varying_seed_dinuc_bigdata.comb.10.noW.MELD_DMRs_Only")
 
 colnames(pred.df) <- c("Age", "Pred_age", "Model", "Seed")
 
