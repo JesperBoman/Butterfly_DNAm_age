@@ -1,0 +1,21 @@
+#Chromosome, CpG position, Methylation level [0-1], Individual, Group/Age
+Chr_7	23000	0	AL11	5
+Chr_7	23007	0	AL11	5
+Chr_7	23014	0	AL11	5
+Chr_7	23020	0	AL11	5
+Chr_7	23035	0	AL11	5
+Chr_7	23039	0	AL11	5
+Chr_7	23075	0	AL11	5
+Chr_7	23083	0	AL11	5
+Chr_7	23101	0	AL11	5
+Chr_7	23643	0	AL11	5
+Chr_Z	17038484	0	GTcoll19H128	long-distance
+Chr_Z	17038488	0	GTcoll19H128	long-distance
+Chr_Z	17038528	0	GTcoll19H128	long-distance
+Chr_Z	17038604	0	GTcoll19H128	long-distance
+Chr_Z	17038624	0	GTcoll19H128	long-distance
+Chr_Z	17038675	0	GTcoll19H128	long-distance
+Chr_Z	17038692	0.0625	GTcoll19H128	long-distance
+Chr_Z	17038713	0	GTcoll19H128	long-distance
+Chr_Z	17038737	0.0769231	GTcoll19H128	long-distance
+Chr_Z	17038746	0	GTcoll19H128	long-distance
