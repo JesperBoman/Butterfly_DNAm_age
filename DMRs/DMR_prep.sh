@@ -31,6 +31,6 @@ wait
 fi
 
 
-done <"wild.samples.18.list"
+done <"wild.samples.list"
 
 wait
