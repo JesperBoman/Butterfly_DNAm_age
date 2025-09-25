@@ -1,13 +1,16 @@
 **Varying seed clock pipeline**
 
-#Preparing data scripts:
+
+**Data preparation**
 
 1. Comb_data.sh
 2. add_E2_data.sh
 
 See example data structure in: example_input_data.txt
 
-#Varying seed clock
+
+
+**Varying seed clock**
 
 This pipeline randomly splits training+test data based on a particular seed and constructs a clock for each seed. We do this to evaluate the effect of a particular training+test split on predictiveness of the model. In a sense, we then get sets of clocks. 
 
