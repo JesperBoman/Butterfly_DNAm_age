@@ -2,7 +2,7 @@
 #SBATCH -J varying_seed_GO_prep
 #SBATCH -o varying_seed_GO_prep.output
 #SBATCH -e varying_seed_GO_prep.error
-#SBATCH --mail-user jesper.boman@gmail.com
+#SBATCH --mail-user "your_email"
 #SBATCH --mail-type=ALL
 #SBATCH -t 00-10:00:00
 #SBATCH -A "project_ID"
