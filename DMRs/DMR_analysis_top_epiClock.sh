@@ -14,7 +14,7 @@ ml bioinfo-tools R_packages/4.1.1
 
 
 
-dir="/crex/proj/uppstore2017185/b2014034_nobackup/Jesper/EpiClock/DMRs"
+dir="."
 
 
 Group1="Meconium"
