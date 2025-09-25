@@ -1,4 +1,8 @@
 #!/usr/bin/env Rscript
+#### A script to perform an analysis of differentially methylated regions (DMRs) using BSmooth
+#### Usage: Rscript fancier_varying_seed_clock.R $i $outdir $inputdata
+#### I run the script in the "varying seed clock approach" using the bash script master.clocksmith.sh, which in turn runs smither.sh
+#### Jesper Boman - 2025-09-25
 
 library(reshape2)
 library(tidymodels) 
@@ -7,27 +11,37 @@ library(dplyr)
 library(doParallel)
 library(zoo)
 
+#This script is inspired Anastasiadi and Piferrer (2023): https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2023.1096909/full
 
 args = commandArgs(trailingOnly = TRUE)
+#Arguments are
+#1) seed (a number to be used for setting the seed)
+#2) output directory
+#3) input data (which is the output of i) comb_data.sh only or after also running ii) add_E2_data.sh
 
 
+#Read input data
 meth.df <- read.table(args[3])
 
 colnames(meth.df) <- c("Chromosome", "Position", "Methylation_level", "Sample", "Age")
 
+#First we optimize a clock based on training and test samples
+
+#We exclude wild samples
 meth.df.sub <- meth.df[meth.df$Age != "meconium",]
 meth.df.sub <- meth.df.sub[meth.df.sub$Age != "long-distance",]
 
 meth.df.sub$Age <- as.numeric(meth.df.sub$Age)
 meth.df.sub$Locus <- paste(meth.df.sub$Chromosome, meth.df.sub$Position, sep="_")
 
-#For CDS only
+#For CDS only, this is to remove duplicated positions with overlapping CDS annotations
 meth.df.sub <- meth.df.sub[!duplicated(meth.df.sub),]
 #
 
+#We make the dataset wide
 meth.df.wide <- dcast(meth.df.sub, Age+Sample~Locus, value.var = "Methylation_level")
 
-
+#Imputation using the mean across all samples for sites with missing data
 meth.df.impute <- meth.df.wide[ , colSums(is.na(meth.df.wide))<3,]
 meth.df.impute<- na.aggregate(meth.df.impute[,3:ncol(meth.df.impute)])
 meth.df.impute<-meth.df.impute[,-1]
@@ -39,6 +53,7 @@ set.seed(args[1])
 
 print(paste("Seed", args[1]))
 
+#Here we split the data into training+test splits. This is a random process, with the randomness controlled by the seed
 splits <- initial_split(meth.df.impute, prop=0.75, strata = Age) 
 age_other <- training(splits) 
 age_test <- testing(splits) 
@@ -111,6 +126,7 @@ sum(coef(elastic_model$finalModel, elastic_model$bestTune $lambda)!=0)
 
 
 print("Compare metrics in the training datasets")
+#This is of lesser interest since you predict age based on the samples you've built the clock on. Predictability should be very good.
 
 predicted.age <-  predict.train(ridge_model, trainTransformed)
 postResample(pred = predicted.age, trainTransformed$Age) 
@@ -129,7 +145,7 @@ cor.test(predicted.age, trainTransformed$Age)
 
 
 
-
+#This is the real test of the clock where you test using your test dataset
 print("Test using test dataset")
 preProcValues <- preProcess(age_test, method = c("center", "scale")) 
 testTransformed <- predict(preProcValues, age_test)
@@ -161,7 +177,7 @@ cor.test(predict.elastic.05.test, testTransformed$Age)
 
 
 
-
+#Save predictions into a dataframe
 test_predictions_df<-as.data.frame(cbind(Age=age_test$Age, Pred_age=predict.ridge.test, Model=rep("Ridge", length(predict.ridge.test))))
 test_predictions_df<-rbind(test_predictions_df, cbind(Age=age_test$Age, Pred_age=predict.lasso.test, Model=rep("Lasso", length(predict.lasso.test))))
 test_predictions_df<-rbind(test_predictions_df, cbind(Age=age_test$Age, Pred_age=predict.elastic.test, Model=rep("Elastic", length(predict.elastic.test))))
@@ -171,6 +187,8 @@ test_predictions_df$Age <- as.numeric(test_predictions_df$Age)
 test_predictions_df$Pred_age <- as.numeric(test_predictions_df$Pred_age)
 
 
+#Here we just create a dataset of mean methylation levels per sample, useful for plotting.
+#This can be skipped but good for exploratory analysis
 mean_per_sample<-plyr::ddply(meth.df, c("Age", "Sample"), function(x) mean(x$Methylation_level, na.rm=T) )
 
 
@@ -181,8 +199,8 @@ mean_per_sample$Age <- factor(mean_per_sample$Age , levels=c("0", "5", "10", "15
 
 mean_per_sample$Experiment <-ifelse(grepl("AL", mean_per_sample$Sample) | grepl("LI", mean_per_sample$Sample), "E2", "E1")
 
-#Comparison with wild samples
-
+                             
+#Predict age of wild samples (i.e. in our case neither training nor test samples)
 meth.df$Locus <- paste(meth.df$Chromosome, meth.df$Position, sep="_")
 
 meth.final<-meth.df[ meth.df$Locus %in% colnames(trainTransformed), ]
@@ -210,7 +228,7 @@ ME.df<-as.data.frame(predict(elastic_model, lwTransformed.ME))
 colnames(ME.df)<-c("Prediction")
 ME.df$Age <- "ME"
 
-
+#Here we create a data frame to output with relevant information
 out.df<-rbind(LD.df, ME.df)
 
 out.df$Seed<-args[1]
@@ -246,7 +264,8 @@ test_predictions_df$Seed<-args[1]
 elastic_cl<-coef(elastic_model$finalModel, elastic_model$bestTune $lambda)
   
 elastic_nonZero_coefs<-elastic_cl@Dimnames [[1]] [elastic_cl@i+1]
-  
+
+#Here we create a data frame of sites included in the final model of the elastic net regression
 meth.df.elastic_nonZero <- meth.df[meth.df$Locus %in% elastic_nonZero_coefs , ]
   
 
@@ -259,7 +278,7 @@ meth.df.elastic_nonZero$Seed <- args[1]
 
 
 
-#save(elastic_model, file=paste(args[2], "/elastic.model.", args[1], ".rda", sep=""))
+save(elastic_model, file=paste(args[2], "/elastic.model.", args[1], ".rda", sep=""))
 write.table(out.df, file = paste(args[2], "/out.df.", args[1], sep=""), quote = F, sep = "\t", row.names = T, col.names = F)
 write.table(test_predictions_df, file = paste(args[2], "/pred.df.", args[1], sep=""), quote = F, sep = "\t", row.names = F, col.names = F)
 write.table(meth.df.elastic_nonZero, file = paste(args[2], "/meth.df.elastic_nonZero.df.", args[1], sep=""), quote = F, sep = "\t", row.names = F, col.names = F)
