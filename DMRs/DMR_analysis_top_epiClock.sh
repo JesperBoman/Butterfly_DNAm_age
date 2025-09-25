@@ -24,7 +24,7 @@ argsG1=$(ls bsseq_formatted_data | grep "M" | awk -v dir="$dir" '{printf dir "/"
 argsG2=$(ls bsseq_formatted_data | grep "B\|H" | awk -v dir="$dir" '{printf dir "/" "bsseq_formatted_data" "/" $1 "\t"}')
 
 #Step 1: Mostly just reading data into bsseq R format
-Rscript DMR_analysis.R $argsG1 $argsG2
+Rscript DMR_analysis_step1.R $argsG1 $argsG2
 
 mv BS_data.rda BS_data_${Group1}v${Group2}.rda
 mv BS_data.fit.rda BS_data_${Group1}v${Group2}.fit.rda
