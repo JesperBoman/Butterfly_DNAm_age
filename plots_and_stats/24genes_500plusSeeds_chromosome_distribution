@@ -1,0 +1,46 @@
+
+setwd("~/Downloads")
+
+
+
+
+#Prep in Terminal
+#ml bioinfo-tools BEDTools/2.31.1
+#bedtools nuc -pattern "CG" -fi GCA_905220365.1_ilVanCard2.1_genomic_chroms_SH.fasta -bed cds.bed > CG_per_cds.bed
+#Only eleven CDSs had no CpGs
+
+#awk 'NR>1{a[$1]+=$13} END{for(chr in a){print chr "\t" a[chr]}}' CG_per_cds.bed
+
+#This assumes that there are no filtering biases that affect the relative proportions of CpGs included in clock models per chromosome
+#cds.length.per.chr <- read.table("total_cds_length_per_chromosome.txt")
+
+#The total CDS length and the number of CpGs on CDSs per chromosome
+cds.length.per.chr <- read.table(file=file.choose(), header=T)
+
+
+twentyfourgenes<-read.table(file=file.choose(), header=T) #Table_S2_24genes_atLeast500seeds_replicate_positions_removed
+twentyfourgenes.counts<-as.data.frame(table(twentyfourgenes$Chromosome))
+
+colnames(twentyfourgenes.counts) <- c("Chromosome", "Observed")
+
+cont.df<-merge(cds.length.per.chr, twentyfourgenes.counts, by="Chromosome", all.x=T)
+
+head(cont.df)
+
+cont.df$Observed <- ifelse(is.na(cont.df$Observed), 0, cont.df$Observed)
+
+cont.df$Expected <- (cont.df$CpG_bases/sum(cont.df$CpG_bases)) * sum(cont.df$Observed)
+
+
+chi2<-sum(((cont.df$Observed-cont.df$Expected)^2)/cont.df$Expected)
+
+degrees.of.freedom<-length(cont.df$Observed) #Goodness-of-fit
+
+pchisq(chi2, df=degrees.of.freedom, lower.tail=F)
+
+chisq.test(x = cont.df$Observed,
+           p = cont.df$Expected / sum(cont.df$Expected),
+           rescale.p = TRUE)
+#p ≈ 1.25e-14 if using CDS length
+#P ≈ 1.79e-13 if using the number of CpGs per CDS
+#These values are very similar meaning that there is not much difference
