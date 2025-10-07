@@ -78,8 +78,9 @@ mps$Upper95CI<-mps$Pred_age+mps$margins
 
 #Plot wild age mean predictions ±95% CI
 mps$Sample<-as.factor(mps$Sample)
+mps$Sample<-factor(mps$Sample, levels = c("GTcoll19M359", "GTcoll19M448", "GTcoll19M450", "GTcoll19M460", "GTcoll19M471", "GTcoll18B720", "GTcoll18B721", "GTcoll18B773", "GTcoll19H116", "GTcoll19H128"))
 
-ggplot(mps, aes(x=factor(Sample, levels = rev(levels(Sample))), y=Pred_age, col=Age )) +
+ggplot(mps, aes(x=Sample, y=Pred_age, col=Age )) +
   geom_pointrange(mapping=aes(y=Pred_age, ymin=Lower95CI, ymax=Upper95CI))+
   ylab("W.clock age (Days)")+
   xlab("Sample")+
