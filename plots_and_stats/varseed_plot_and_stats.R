@@ -76,17 +76,17 @@ mps$Upper95CI<-mps$Pred_age+mps$margins
 
 
 
-ggplot(mps, aes(x=rev(as.factor(Sample)), y=Pred_age, col=Age )) +
+#Plot wild age mean predictions ±95% CI
+mps$Sample<-as.factor(mps$Sample)
+
+ggplot(mps, aes(x=factor(Sample, levels = rev(levels(Sample))), y=Pred_age, col=Age )) +
   geom_pointrange(mapping=aes(y=Pred_age, ymin=Lower95CI, ymax=Upper95CI))+
   ylab("W.clock age (Days)")+
   xlab("Sample")+
   theme_bw()+
   ylim(0,17)+
   scale_colour_manual(values=c("#1E88E5", "#D81B60"), name="Group")+
- # theme(aspect.ratio=1, element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text.y=element_text(size=16, colour="black"), axis.text.x=element_blank(), axis.ticks.x=element_blank(), axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
-  theme(aspect.ratio=1, element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text.y=element_text(size=16, colour="black"), axis.text.x = element_text(angle = 90, vjust = 0, hjust=0), axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
-
- # ylim(0,25)
+  theme(aspect.ratio=1, element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text.y=element_text(size=16, colour="black"), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
 
 
 
