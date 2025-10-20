@@ -1,0 +1,62 @@
+Readme file
+
+author: Megan Reich
+date: October 2025
+contact: meganreich13@gmail.com; mreich@uottawa.ca
+folder: isotope_geolocation
+
+file: isotope_script.R
+	description: R script to apply hydrogen and strontium isotope-based geographic assignment, combined with a monthly species distribution model, to estimate  the natal origin of 5 painted lady butterflies captured in Benin and Senegal. From each, estimates of the  minimum distance-traveled and maximum distance traveled are calculated.
+	non-package data references:
+	  Sr Isoscape manuscript citation: Reich, M. S., Ghouri, S., Zabudsky, S., Hu, L., Le Corre, M., Ng’iru, I., Benyamini, D., Shipilina, D., Collins, S. C., Martins, D. J., Vila, R., Talavera, G., & Bataille, C. P. (2024). Trans-Saharan migratory patterns in Vanessa cardui and evidence for a southward leapfrog migration. iScience, 27(12), 111342. https://doi.org/10.1016/j.isci.2024.111342
+    Sr Isoscape data citation and location: Reich, M. S., Ghouri, S., Zabudsky, S., Hu, L., Le Corre, M., Ng’iru, I., … bataille, clement. (2024, October 30). Isotope geolocation. Retrieved from osf.io/rnfmp
+    d2H Calibration data citation: Ghouri, S., Reich, M. S., Lopez‐Mañas, R., Talavera, G., Bowen, G. J., Vila, R., Talla, V. N. K., Collins, S. C., Martins, D. J., & Bataille, C. P. (2024). A hydrogen isoscape for tracing the migration of herbivorous lepidopterans across the Afro‐Palearctic range. Rapid Communications in Mass Spectrometry, 38(3), e9675. https://doi.org/10.1002/rcm.9675
+    species distribution model: Talavera, G., García-Berro, A., Talla, V. N. K., Ng’iru, I., Bahleman, F., Kébé, K., Nzala, K. M., Plasencia, D., Marafi, M. A. J., Kassie, A., Goudégnon, E. O. A., Kiki, M., Benyamini, D., Reich, M. S., López-Mañas, R., Benetello, F., Collins, S. C., Bataille, C. P., Pierce, N. E., … Vila, R. (2023). The Afrotropical breeding grounds of the Palearctic-African migratory painted lady butterflies (Vanessa cardui). Proceedings of the National Academy of Sciences, 120(16), e2218280120. https://doi.org/10.1073/pnas.2218280120
+
+file: isotope_data.csv
+	description: Metadata and isotope data for the 10 wild-caught specimens
+	columns:
+		Sample_ID = shorthand sample ID
+		Sample_ID2 = sample ID
+		Locality.ID = ID code of capture locality
+		status = either "meconium" or "long-distance." See manuscript for description.
+		Order = insect order
+		Family = insect family
+		Subfamily = insect subfamily
+		Genus = insect genus
+		Species = insect species
+		Date = date of capture
+		Day = day of month of capture
+		Month = numeric month of capture
+		Year = year of capture
+		Country = country of capture
+		Geographic_Region = continent of capture
+		Lat = latitude in decimal degrees (WGS84)
+		Lon = longitude in decimal degrees (WGs84)
+		Collector = names of collectors
+		Det_by = names of insect identifiers
+		comment = field comments
+		comment2 = additional field comments
+		Wing_wear = wing wear scores from 1 to 5. Detailed scale description can be found in Stefanescu et al (2016):
+		  Stefanescu, C., Soto, D. X., Talavera, G., Vila, R., & Hobson, K. A. (2016). Long-distance autumn migration across the Sahara by painted lady butterflies: Exploiting resource pulses in the tropical savannah. Biology Letters, 12, 1–4. https://doi.org/10.1098/rsbl.2016.0561
+		Sex = "F" for female or "M" for male
+		ID_H = laboratory ID
+		Lab_ID2_H = ID used by the Jan Veizer Lab
+		VeizerSIL_No = run number of the Jan Veizer Lab
+		X87_86_Kr_Rb_corr_xc = Strontium isotope ratio (corrected for Kr and Rb)
+		X87_86_Kr_Rb_corr_xc_2SE = uncertainty of the strontium isotope ratio (2SE)
+		Sr_V = voltage of 88Sr
+		H_Weight_mg = mass of material (mg) weighed into silver capsule for d2H analysis
+		Delta2H_permil = d2H value (in permil) relative to VSMOW
+		H_percent = percent hydrogen of sample
+		Ampl_mV =
+		Delta2H_permil_err = uncertainty of d2H value
+
+file: extent3.shp
+  description: shapefile of country outlines from rnaturalearth
+  Massicotte, P., & South, A. (2023). rnaturalearth: World Map Data from Natural Earth.
+
+file: occRep_ensemble_TSSbin_08.asc
+  description: Spatiotemporal distribution model of V. cardui breeding grounds during the month of August, from Talavera et al. (2023). See Talavera et al. (2023) for a complete description.
+  Talavera, G., García-Berro, A., Talla, V. N. K., Ng’iru, I., Bahleman, F., Kébé, K., Nzala, K. M., Plasencia, D., Marafi, M. A. J., Kassie, A., Goudégnon, E. O. A., Kiki, M., Benyamini, D., Reich, M. S., López-Mañas, R., Benetello, F., Collins, S. C., Bataille, C. P., Pierce, N. E., … Vila, R. (2023). The Afrotropical breeding grounds of the Palearctic-African migratory painted lady butterflies (Vanessa cardui). Proceedings of the National Academy of Sciences, 120(16), e2218280120. https://doi.org/10.1073/pnas.2218280120
+
