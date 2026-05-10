@@ -77,8 +77,6 @@ filteredDescr <- age_other[, -nzv.cpg.list]
 print("Dimensions filteredDescr")
 dim(filteredDescr)
 
-print("Number of CpGs in final input set:")
-dim(filteredDescr.cor)
 
 #Exclude highly correlated variables
 filteredDescr$Age <- as.numeric(filteredDescr$Age)
@@ -87,6 +85,9 @@ highlyCorDescr <- try(findCorrelation(filteredDescr[ , -which(names(filteredDesc
 dim(highlyCorDescr)
 
 filteredDescr.cor <- filteredDescr[,-highlyCorDescr]
+
+print("Number of CpGs in final input set:")
+dim(filteredDescr.cor)
 
 print("Transformation via preProcess data")
 preProcValues <- preProcess(filteredDescr.cor, method = c("center", "scale")) 
