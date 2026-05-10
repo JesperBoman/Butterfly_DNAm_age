@@ -77,6 +77,8 @@ filteredDescr <- age_other[, -nzv.cpg.list]
 print("Dimensions filteredDescr")
 dim(filteredDescr)
 
+print("Number of CpGs in final input set:")
+dim(filteredDescr.cor)
 
 #Exclude highly correlated variables
 filteredDescr$Age <- as.numeric(filteredDescr$Age)
