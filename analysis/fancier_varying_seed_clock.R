@@ -82,6 +82,7 @@ dim(filteredDescr)
 filteredDescr$Age <- as.numeric(filteredDescr$Age)
 highlyCorDescr <- try(findCorrelation(filteredDescr[ , -which(names(filteredDescr) %in% c("Age")) ], cutoff = 0.8))
 
+print("Dimensions highlyCorDescr")
 dim(highlyCorDescr)
 
 filteredDescr.cor <- filteredDescr[,-highlyCorDescr]
