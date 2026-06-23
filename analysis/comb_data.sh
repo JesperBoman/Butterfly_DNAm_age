@@ -2,7 +2,7 @@
 #SBATCH -J comb_data
 #SBATCH -o comb_data.output
 #SBATCH -e comb_data.error
-#SBATCH --mail-user jesper.boman@gmail.com
+#SBATCH --mail-user ""
 #SBATCH --mail-type=ALL
 #SBATCH -t 00-05:00:00
 #SBATCH -A "your project ID"
