@@ -30,7 +30,11 @@ mean_per_sample$margins<-qt(0.975,df=N$Freq-1)*(mean_per_sample$Avg*100)/sqrt(N$
 
 mean_per_sample$Sample_type <- ifelse(mean_per_sample$Experiment == "Wild", "Wild", "Experimental")
 
-ggplot(mean_per_sample, aes(x=Age, y=Avg*100, col=Experiment))+geom_point(size=4, position=position_dodge2(width=0.1), alpha=0.6)+
+sample_sex <- read.table(file=file.choose(), header=T)
+
+mean_per_sample<-merge(mean_per_sample, sample_sex)
+                             
+ggplot(mean_per_sample, aes(x=Age, y=Avg*100, col=Experiment, shape=Sex))+geom_point(size=4, position=position_dodge2(width=0.1), alpha=0.6)+
   geom_linerange(data=mean_per_sample, aes(y=Avg*100, ymin=(Avg*100)-margins, ymax=(Avg*100)+margins), size=1, alpha=1, col="black",position=position_dodge2(width=0.1))+
   theme_bw()+
   ylab("CDS Methylation (%)")+
@@ -38,4 +42,3 @@ ggplot(mean_per_sample, aes(x=Age, y=Avg*100, col=Experiment))+geom_point(size=4
   scale_color_manual(values=c("#44AA99", "#882255", "orange"), name="")+
   facet_grid(~Sample_type,  scales = "free_x", space = "free")+
   theme(strip.text = element_blank(), element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text=element_text(size=16, colour="black"), axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
-
