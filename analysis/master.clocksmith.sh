@@ -17,6 +17,5 @@ fro=$(( to+1 ))
 to=$(( 10*i ))
 
 
-sbatch -J smither.$id.$fro.$to -o slurm/smither.$id.$fro.$to.output -e slurm/smither.$id.$fro.$to.error -A "project_ID" -t 24:00:00 -p core -n 5 smither.sh $fro $to $outdir $inputdata
-
+sbatch -J smither.$id.$fro.$to -o slurm/smither.$id.$fro.$to.output -e slurm/smither.$id.$fro.$to.error -A "project ID" -t 4:00:00 -n 5 --mem 40GB smither.sh $fro $to $outdir $inputdata
 done
