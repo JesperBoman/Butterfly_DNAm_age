@@ -5,11 +5,8 @@ library(ggpubr)
 setwd("~/Downloads")
 
 
-# Wild samples ####
+#### Wild samples ####
 varseed.df <- read.table(file="df.out.1-1000.bigdata.comb.10.noW.MELD_DMRs_Only")
-#varseed.df <- read.table(file="df.out.varying_seed_dinuc_data.comb.10.noW.MELD_DMRs_Only")
-#varseed.df <- read.table(file="df.out.1-1000.data.comb.10.noW.MELD_DMRs_Only.Full_Lifespan")
-#varseed.df <- read.table(file="df.out.1-1000.varying_seed_GT_CDS_dinuc.Full_Lifespan")
 
 
 colnames(varseed.df) <- c("Sample", "Pred_age", "Age", "Seed", "eltest.p", "eltest.intercept", "eltest.slope", "eltest.adj.r.squared", "eltest.lm.p")
@@ -91,43 +88,6 @@ ggplot(mps, aes(x=Sample, y=Pred_age, col=Age )) +
 
 
 
-ggplot(varseed.df, aes(x=Sample, y=Pred_age, group=Seed))+geom_line(alpha=0.1, col="blue")+
-  geom_line(data=varseed.df[varseed.df$eltest.lm.p < 0.05 & abs(varseed.df$eltest.intercept) < 0.2 & varseed.df$eltest.slope > 0.9 & varseed.df$eltest.slope < 1.1,], aes(x=Sample, y=Pred_age, group=Seed), alpha=0.7, col="red" )#+
-#  geom_line(data=varseed.df[varseed.df$Seed == 238,], aes(x=Sample, y=Pred_age, group=Seed), alpha=1, col="red", lwd=2 )
-
-
-varseed.df2 <- read.table(file="df.out.1-1000.bigdata.comb.10.noW.MELD_DMRs_Only")
-colnames(varseed.df2) <- c("Sample", "Pred_age", "Age", "Seed", "eltest.p", "eltest.intercept", "eltest.slope", "eltest.adj.r.squared", "eltest.lm.p")
-
-
-
-
-varseed.df$Sample<-sample.map$name
-varseed.df2$Sample<-sample.map$name
-
-ggplot(mps, aes(x=Sample, y=Pred_age, col=Age )) +
-  geom_line(data=varseed.df, aes(x=Sample, y=Pred_age, group=Seed), alpha=0.05, col="blue")+
-  geom_line(data=varseed.df2, aes(x=Sample, y=Pred_age, group=Seed), alpha=0.05, col="turquoise2")+
-  
-  #geom_pointrange(mapping=aes(y=Pred_age, ymin=Pred_age-margins, ymax=Pred_age+margins))+
-  theme_bw()+
-
-  ylab("Predicted age")+
-  scale_colour_manual(values=c("#FFC107", "#D81B60"), name="Group")+
-  theme(aspect.ratio=1, element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text.y=element_text(size=16, colour="black"), axis.text.x = element_text(angle = 90, vjust = 0, hjust=0), axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
-
-
-
-#Significantly "better" clocks for those with significant ANOVA between ME and LD
-t.test(varseed.df[varseed.df$anova.p < 0.05,]$eltest.p, varseed.df[varseed.df$anova.p >= 0.05,]$eltest.p)
-
-t.test(varseed.df[varseed.df$anova.p < 0.05 & varseed.df$Age == "LD",]$Pred_age, varseed.df[varseed.df$anova.p < 0.05 & varseed.df$Age == "ME",]$Pred_age, paired=T)
-
-
-good.lab.clock <- varseed.df[varseed.df$eltest.lm.p < 0.05 & abs(varseed.df$eltest.intercept) < 0.2 & varseed.df$eltest.slope > 0.9 & varseed.df$eltest.slope < 1.1,]
-
-t.test(good.lab.clock[good.lab.clock$Age == "LD",]$Pred_age, good.lab.clock[good.lab.clock$Age == "ME",]$Pred_age)
-
 
 
 #### Migration distance versus age ####
@@ -140,39 +100,53 @@ w.clock.dist.df<-data.frame(samples=unique(mps$Sample),
 
 #Estimated flight distance per day (km)
 #Lower bound 
-w.clock.dist.df$dist.min/w.clock.dist.df$age.lower95CI
+round(w.clock.dist.df$dist.min/w.clock.dist.df$age.lower95CI, digits=0)
 
 #Upper bound
-w.clock.dist.df$dist.max/w.clock.dist.df$age.upper95CI
+round(w.clock.dist.df$dist.max/w.clock.dist.df$age.upper95CI, digits=0)
 
 #Flight velocity - 24 hours of flying per day
 #Lower bound
-((w.clock.dist.df$dist.min/w.clock.dist.df$age.lower95CI)*1000)/(24*60*60)
+round(((w.clock.dist.df$dist.min/w.clock.dist.df$age.lower95CI)*1000)/(24*60*60), digits=1)
 
 #Upper bound
-((w.clock.dist.df$dist.max/w.clock.dist.df$age.upper95CI)*1000)/(24*60*60)
+round(((w.clock.dist.df$dist.max/w.clock.dist.df$age.upper95CI)*1000)/(24*60*60), digits=1)
 
 #Flight velocity - 12 hours of flying per day
 #Lower bound
-((w.clock.dist.df$dist.min/w.clock.dist.df$age.lower95CI)*1000)/(12*60*60)
+round(((w.clock.dist.df$dist.min/w.clock.dist.df$age.lower95CI)*1000)/(12*60*60), digits=1)
 
 #Upper bound
-((w.clock.dist.df$dist.max/w.clock.dist.df$age.upper95CI)*1000)/(12*60*60)
+round(((w.clock.dist.df$dist.max/w.clock.dist.df$age.upper95CI)*1000)/(12*60*60), digits=1)
 
 
+#Sahara calculation
+1800/(w.clock.dist.df$dist.min/w.clock.dist.df$age.lower95CI)
+1800/(w.clock.dist.df$dist.max/w.clock.dist.df$age.upper95CI)
 
-
+w.clock.dist.df$Wing_wear <-c(2.5, 2, 5, 2, 4, 1.5, 2, 1.5, 2, 2)
 
 #Distance vs age
-ggplot(w.clock.dist.df, aes(x=age.average, y=(dist.max-dist.min)/2, col=SG))+geom_point()+
+ggplot(w.clock.dist.df, aes(x=age.average, y=dist.min+(dist.max-dist.min)/2, col=SG))+geom_point()+
   geom_pointrange(aes(ymax=dist.max, ymin=dist.min), alpha=0.8)+
-  geom_errorbarh(aes(xmax = age.average+age.upper95CI, xmin = age.average-age.lower95CI, height = 0), alpha=0.8)+
+  geom_pointrange(aes(xmax = age.upper95CI, xmin = age.lower95CI), alpha=0.8)+
   theme_bw()+
   ylab("Predicted flight distance")+
-  xlab("Predicted age")+
+  xlab("W.clock age")+
   scale_colour_manual(values=c("#1E88E5", "#D81B60"), name="Group")+
   theme(aspect.ratio=1, element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text=element_text(size=16, colour="black"),  axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
 
+#Wing wear vs age
+ggplot(w.clock.dist.df, aes(x=age.average, y=Wing_wear, col=SG))+geom_point()+
+  geom_pointrange(aes(xmax = age.upper95CI, xmin = age.lower95CI), alpha=0.8)+
+  theme_bw()+
+  ylim(1,5)+
+  ylab("Wing wear")+
+  xlab("W.clock age")+
+  scale_colour_manual(values=c("#1E88E5", "#D81B60"), name="Group")+
+  theme(aspect.ratio=1, element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text=element_text(size=16, colour="black"),  axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
+
+cor.test(w.clock.dist.df$age.average, w.clock.dist.df$Wing_wear)
 
 
 
@@ -191,26 +165,47 @@ set.seed(1000)
 lmod.df.int_and_slope <- plyr::ddply(pred.df[pred.df$Model == "Elastic",], c("Seed"), function(x) lmodel2(jitter(Age, amount=2)~Pred_age, data=x)$regression.results[1, 2:3])
 #lmod.df.CIs <- plyr::ddply(pred.df[pred.df$Model == "Elastic",], c("Seed"), function(x) lmodel2(Age~Pred_age, data=x)$confidence.intervals[2, 2:5] )
 
-#lm_eqn <- function(df){
-#  m <- lm(df[,1] ~ df[,2], df);
-#  eq <- substitute(italic(y) == a + b %.% italic(x),
-#                        list(a = format(unname(coef(m)[1]), digits = 2),
-#                        b = format(unname(coef(m)[2]), digits = 2)))
-#  as.character(as.expression(eq));
-#}
 
 avg_of_slopes<-as.character(as.expression(substitute(italic(y) == a + b %.% italic(x),
            list(a = format(mean(lmod.df.int_and_slope$Intercept), digits = 2),
                 b = format(mean(lmod.df.int_and_slope$Slope), digits = 2)))))
 
+mad_of_slopes <- as.expression(
+  substitute(
+    atop(MAD[I] == a, MAD[S] == b),
+    list(
+      a = format(mad(lmod.df.int_and_slope$Intercept), digits = 2),
+      b = format(mad(lmod.df.int_and_slope$Slope), digits = 2)
+    )
+  )
+)
 
 
 
 ggplot(lmod.df.int_and_slope)+
   geom_abline(linetype=2, size=1)+
   geom_abline(aes(slope = Slope, intercept = Intercept), alpha=0.05, col="blue") +
+  #  geom_text(x = 4, y = 25, label = lm_eqn(pred.df), parse = TRUE, col="red")+
+  #geom_text(x = 6, y = 25, label = mad_of_slopes, parse = TRUE, col="red", size=5)+
+  ylab("Age (Days)")+
+  theme_bw()+
+  ylim(0,30)+
+  xlim(0,30)+
+  xlab("E.clock age (Days)")+
+  geom_abline(data=NULL,aes(slope = mean(lmod.df.int_and_slope$Slope), intercept=mean(lmod.df.int_and_slope$Intercept)), col="red", size=1)+
+  #geom_line(data=pred.df[pred.df$Model == "Elastic",], aes(x=Pred_age, y=Age),stat="smooth",method="lm", alpha=1, size=1, col="red")+ 
+  theme(aspect.ratio=1, element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text=element_text(size=16, colour="black"), axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
+
+
+
+#Full dataset fig
+ggplot(lmod.df.int_and_slope)+
+  geom_abline(linetype=2, size=1)+
+  geom_abline(aes(slope = Slope, intercept = Intercept), alpha=0.05, col="blue") +
 #  geom_text(x = 4, y = 25, label = lm_eqn(pred.df), parse = TRUE, col="red")+
   geom_text(x = 4, y = 28, label = avg_of_slopes, parse = TRUE, col="red", size=5)+
+  geom_text(x = 4, y = 23, label = mad_of_slopes, parse = TRUE, col="red", size=5)+
+  
   ylab("Age (Days)")+
   theme_bw()+
   ylim(0,30)+
@@ -218,59 +213,96 @@ ggplot(lmod.df.int_and_slope)+
   xlab("E.clock age (Days)")+
   geom_abline(data=NULL,aes(slope = mean(lmod.df.int_and_slope$Slope), intercept=mean(lmod.df.int_and_slope$Intercept)), col="red", size=1)+
 
-  
-  #geom_line(data=pred.df[pred.df$Model == "Elastic",], aes(x=Pred_age, y=Age),stat="smooth",method="lm", alpha=1, size=1, col="red")+ 
-  theme(aspect.ratio=1, element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text=element_text(size=16, colour="black"), axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
 
-
-###
-
-ggplot(pred.df[pred.df$Model == "Elastic",], aes(x=Pred_age, y=Age))+
-  geom_abline(linetype=1, size=1)+
-  geom_smooth(method="lm", alpha=0.5, size=0,col="blue", fill="turquoise")+
-  geom_line(stat="smooth",method="lm", alpha=0.5, size=1,col="blue", fill="turquoise")+
+#Plot to show a specific seed
+ggplot(pred.df[pred.df$Model == "Elastic" & pred.df$Seed == 1000,], aes(x=Pred_age, y=Age))+
+  geom_abline(linetype=2, size=1, alpha=0.3)+
+  geom_point()+
+  ylab("Age (Days)")+
   theme_bw()+
-  ylim(0,30)+
-  xlim(0,30)+
-  #geom_abline(linetype=1, size=2)+
-  theme(aspect.ratio=1)
-
-ggplot(pred.df[pred.df$Model == "Elastic",], aes(x=Pred_age, y=Age, group=Seed))+
-  geom_abline(linetype=1, size=1)+
-  geom_smooth(method="lm", alpha=0.05, size=0,col="blue", fill="turquoise")+
-  geom_line(stat="smooth",method="lm", alpha=0.1, size=0.4,col="blue")+
-  theme_bw()+
-  #geom_abline(linetype=1, size=2)+
-  theme(aspect.ratio=1)+
+  ylim(-5,30)+
+  xlim(-5,30)+
+  xlab("E.clock age (Days)")+
   theme( element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text=element_text(size=16, colour="black"), axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
 
 
-
-#RMSE and Rsquared from predictions per seed ####
+#RMSE, MAE and Rsquared from predictions per seed ####
 
 library(caret) 
-seeds<-unique(pred.df$Seed)
-
 PR_func<- function(x) {postResample(pred.df[pred.df$Model == "Elastic" & pred.df$Seed == x ,]$Pred_age, pred.df[pred.df$Model == "Elastic"  & pred.df$Seed == x,]$Age)}
 
-pred.stats<-lapply(seeds, PR_func)
 
-RMSEs<-sapply(pred.stats, function(x) if(length(x) >= 1) x[[1]] else NA)
-R2s<-sapply(pred.stats, function(x) if(length(x) >= 1) x[[2]] else NA)
+library(patchwork)
 
-mean(RMSEs)
-mean(R2s)
+loopVec<-c(20,25,30,35,40,45)
+loopVec<-c("all.pred.males_CDS_dinuc_fvsc5", "all.pred.females_CDS_dinuc_fvsc5", "all.pred.GT_CDS_dinuc_fvsc5", "all.pred.GT_no30_CDS_dinuc_fvsc5")
 
-ggplot(data=NULL, aes(x=RMSEs, y=R2s))+geom_point(alpha=0.4)+
-  theme_bw()+
-  ylim(0,1)+
-  xlim(0,11)+
-  ylab("Variance explained")+
-  xlab("RMSE (days)")+
-  theme(aspect.ratio=1)+
-  theme( element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text=element_text(size=16, colour="black"), axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
+p <- list()
+for(i in loopVec){
+  pred.df <- read.table(paste0("subsampleN.", i, ".pred.df"))
+  pred.df <- read.table(i)
+  colnames(pred.df) <- c("Age", "Pred_age", "Model", "Seed")
+  
+  seeds<-unique(pred.df$Seed)
+  
+  pred.stats<-lapply(seeds, PR_func)
+  
+  RMSEs<-sapply(pred.stats, function(x) if(length(x) >= 1) x[[1]] else NA)
+  R2s<-sapply(pred.stats, function(x) if(length(x) >= 1) x[[2]] else NA)
+  MAEs<-sapply(pred.stats, function(x) if(length(x) >= 1) x[[3]] else NA)
+  
+  df_rmse <- data.frame(RMSE = RMSEs, R2 = R2s)
+  df_mae <- data.frame(MAE = MAEs)
+
+  print(paste("Sample size", i))
+  print(mean(RMSEs))
+  print(mean(R2s))
+  print(mean(MAEs))
+  
+  p1<-ggplot(data=df_rmse, aes(x=RMSE, y=R2))+geom_point(alpha=0.4)+
+    theme_bw()+
+    ylim(0,1)+
+    xlim(0,20)+
+    ylab("Variance explained")+
+    xlab("RMSE (days)")+
+    theme(aspect.ratio=1)+
+    theme( element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text=element_text(size=16, colour="black"), axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
+  
+  p2<-ggplot(data=df_mae, aes(x=MAE))+geom_histogram(alpha=0.7, bins=50)+
+    geom_vline(xintercept=mean(MAEs), lty=1, col="red", lwd=1.8)+
+    theme_bw()+
+    ylab("Counts")+
+    xlab("MAE (Days)")+
+    theme(aspect.ratio=1)+
+    xlim(0,20)+
+    theme( element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text=element_text(size=16, colour="black"), axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
+  
+  
+  if(i != 45){
+    p1 <- p1 +
+      theme(axis.title.x = element_blank(),
+            axis.text.x  = element_blank(),
+            axis.ticks.x = element_blank())
+    
+    p2 <- p2 +
+      theme(axis.title.x = element_blank(),
+            axis.text.x  = element_blank(),
+            axis.ticks.x = element_blank())
+  }
+  
+
+  p[[as.character(i)]] <- p1 + p2
+  
+  
+  
+}
 
 
+wrap_plots(p, ncol = 1) &
+  theme(
+    axis.title = element_text(size = 14),
+    axis.text  = element_text(size = 12)
+  )
 
 #How many non-zero coefficients?####
 
@@ -311,16 +343,19 @@ ggplot(mean_per_sample_nonzero, aes(x=Age, y=Avg*100, col=Experiment))+geom_poin
 
 lmod<-lmodel2(Methylation_level~as.integer(Age), df.nonzero[df.nonzero$Seed == 1 & df.nonzero$Locus == "Chr_1_6118963" & df.nonzero$Age != "ME" & df.nonzero$Age != "LD",])
 
+#Original
 locus.coefs.df<-plyr::ddply(df.nonzero[df.nonzero$Age != "ME" & df.nonzero$Age != "LD",], c("Seed", "Locus"), function(x) lmodel2(Methylation_level~as.integer(Age), data=x)$regression.results[1, 2:3])
 
+#Flatten
+locus.coefs.df.flat <- locus.coefs.df[!duplicated(locus.coefs.df[c("Locus", "Intercept", "Slope")]), ]
 
-ggplot(locus.coefs.df, aes(x=Slope))+geom_histogram(colour="red", fill="orange")+geom_vline(xintercept=0)+
+ggplot(locus.coefs.df.flat, aes(x=Slope))+geom_histogram(colour="red", fill="orange")+geom_vline(xintercept=0)+
   theme_bw()+
   ylab("Count")+
   theme(aspect.ratio=1, element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text=element_text(size=16, colour="black"), axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
 
 
-prop.table(table(sign(locus.coefs.df$Slope)))
+prop.table(table(sign(locus.coefs.df.flat$Slope)))
 
 locus.count.df<-as.data.frame(table(locus.coefs.df$Locus))
 colnames(locus.count.df)<-c("Locus", "Count")
@@ -331,7 +366,7 @@ ggplot(locus.count.df, aes(x=Count/10))+geom_histogram(colour="red", fill="orang
   theme_bw()+
   ylab("Count")+
   xlab("Included in percent of models")+
-  geom_bracket(xmin = 10, xmax = 99, y.position = 300, tip.length=0.2,label.size=6, label = "160 genes")+
-  geom_bracket(xmin = 50, xmax = 99, y.position = 41, tip.length=0.1, label.size=6, label = "24 genes")+
+  geom_bracket(xmin = 10, xmax = 99, y.position = 300, tip.length=0.2,label.size=6, label = "197 genes")+
+  geom_bracket(xmin = 50, xmax = 99, y.position = 41, tip.length=0.1, label.size=6, label = "64 genes")+
   theme(aspect.ratio=1, element_text(face = "bold", hjust = 0.5),  panel.border = element_rect(colour = "black", fill=NA, linewidth=1), axis.text=element_text(size=16, colour="black"), axis.title=element_text(size=18), legend.text=element_text(size=14),  legend.title=element_text(size=16))
 
