@@ -1,10 +1,10 @@
 #!/bin/bash -l
 
 outdir="varying_seed_CDS_dinuc"
-mkdir $outdir
 inputdata="bigdata.comb.10.noW.CDSonly"
 id="bigdata.comb.10.noW.CDSonly"
 
+mkdir -p $outdir
 
 unset to #If starting from anything but 1, then "to" needs to be set to a relevant variable
 unset fro
