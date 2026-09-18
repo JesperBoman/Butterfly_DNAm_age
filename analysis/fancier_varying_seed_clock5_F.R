@@ -1,19 +1,49 @@
 #!/usr/bin/env Rscript
-#### A script to perform an analysis of differentially methylated regions (DMRs) using BSmooth
-#### Usage: Rscript fancier_varying_seed_clock.R $i $outdir $inputdata
+#### A script to train an epigenetic aging clock
+#### Usage: Rscript fancier_varying_seed_clock5_F.R $i $outdir $inputdata $threshold_age
 #### I run the script in the "varying seed clock approach" using the bash script master.clocksmith.sh, which in turn runs smither.sh
-#### Jesper Boman - 2025-09-25
+#### Jesper Boman - 2026-09-18
 
 library(reshape2)
 library(tidymodels) 
-library(caret) 
+library(caret)
 library(dplyr)
 library(doParallel)
 library(zoo)
 
+#### CHANGELOG ####
+#fancier_varying_seed_clock3
+#Builds on fancier_varying_seed_clock
+
+#Changed this below:
+#preProcValues <- preProcess(age_test, method=c("center","scale"))
+#testTransformed <- predict(preProcValues, age_test)
+
+#To
+#testTransformed <- predict(preProcValues, age_test)
+
+#To avoid "data leakage" issue
+
+#fancier_varying_seed_clock4_F
+#Builds on fancier_varying_seed_clock3, adds a piecewise age transformation to account for faster aging at young ages 
+
+
+#fancier_varying_seed_clock5_F
+#Second data leakage issue fix
+#preProcValues <- preProcess(meth.final.impute, method = c("center", "scale")) 
+
+#And adding adult age as an input parameter
+
+#Fixed code for checking for highly correlated variables
+
+###################
+
+
 #This script is inspired Anastasiadi and Piferrer (2023): https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2023.1096909/full
 
+
 args = commandArgs(trailingOnly = TRUE)
+
 #Arguments are
 #1) seed (a number to be used for setting the seed)
 #2) output directory
@@ -57,7 +87,7 @@ print(paste("Seed", args[1]))
 splits <- initial_split(meth.df.impute, prop=0.75, strata = Age) 
 age_other <- training(splits) 
 age_test <- testing(splits) 
- 
+
 
 print("Training set proportions by age class")
 age_other %>% count(Age) %>% mutate(prop = n/sum(n)) 
@@ -80,28 +110,61 @@ dim(filteredDescr)
 
 #Exclude highly correlated variables
 filteredDescr$Age <- as.numeric(filteredDescr$Age)
-highlyCorDescr <- try(findCorrelation(filteredDescr[ , -which(names(filteredDescr) %in% c("Age")) ], cutoff = 0.8))
 
-print("Dimensions highlyCorDescr")
-dim(highlyCorDescr)
+cor.mat <- cor(
+  filteredDescr[, !(names(filteredDescr) %in% "Age")],
+  use = "pairwise.complete.obs"
+)
 
-filteredDescr.cor <- filteredDescr[,-highlyCorDescr]
+highlyCorDescr <- findCorrelation(
+  cor.mat,
+  cutoff = 0.8
+)
+print("Number of highly correlated CpGs:")
+length(highlyCorDescr)
+
+filteredDescr.cor <- filteredDescr[, -highlyCorDescr]
+
+#For some reason have to skip previous step for top50 DMRs
+#filteredDescr.cor <- filteredDescr
 
 print("Number of CpGs in final input set:")
 dim(filteredDescr.cor)
 
 print("Transformation via preProcess data")
-preProcValues <- preProcess(filteredDescr.cor, method = c("center", "scale")) 
+preProcValues <- preProcess(
+  filteredDescr.cor[, !(names(filteredDescr.cor) %in% "Age")],
+  method = c("center","scale")
+)
 trainTransformed <- predict(preProcValues, filteredDescr.cor)
-   
 
 
-print("Predicting")
+
+print("Training")
 fitControl <- trainControl(method = "repeatedcv" ,number=10, repeats=10)
 lambda_vals <- 10^seq(-3, 3, length = 10)
 
+adult_age<-as.numeric(args[4])
 
-trainTransformed$Age <- age_other$Age
+F_age <- function(age, adult.age = adult_age) {
+  ifelse(
+    age <= adult.age,
+    log(age + 1) - log(adult.age + 1),
+    (age - adult.age) / (adult.age + 1)
+  )
+}
+
+Finv <- function(y, adult.age = adult_age) {
+  ifelse(
+    y <= 0,
+    (adult.age + 1) * exp(y) - 1,
+    adult.age + y * (adult.age + 1)
+  )
+}
+
+
+trainTransformed$Age <- F_age(age_other$Age)
+
 
 cl <- makePSOCKcluster(5)
 registerDoParallel(cl)
@@ -132,49 +195,50 @@ sum(coef(elastic_model$finalModel, elastic_model$bestTune $lambda)!=0)
 print("Compare metrics in the training datasets")
 #This is of lesser interest since you predict age based on the samples you've built the clock on. Predictability should be very good.
 
-predicted.age <-  predict.train(ridge_model, trainTransformed)
-postResample(pred = predicted.age, trainTransformed$Age) 
-cor.test(predicted.age, trainTransformed$Age)
+predicted.age <-  Finv(predict.train(ridge_model, trainTransformed))
+postResample(pred = predicted.age, age_other$Age) 
+try(cor.test(predicted.age, age_other$Age))
 
-predicted.age <-  predict.train(lasso_model, trainTransformed)
-postResample(pred = predicted.age, trainTransformed$Age) 
-cor.test(predicted.age, trainTransformed$Age)
+predicted.age <-  Finv(predict.train(lasso_model, trainTransformed))
+postResample(pred = predicted.age, age_other$Age) 
+try(cor.test(predicted.age, age_other$Age))
 
-predicted.age <-  predict.train(elastic_model, trainTransformed)
-postResample(pred = predicted.age, trainTransformed$Age) 
-cor.test(predicted.age, trainTransformed$Age)
-
-
+predicted.age <-  Finv(predict.train(elastic_model, trainTransformed))
+postResample(pred = predicted.age, age_other$Age) 
+try(cor.test(predicted.age, age_other$Age))
 
 
 
 
-#This is the real test of the clock where you test using your test dataset
+
+
+
 print("Test using test dataset")
-preProcValues <- preProcess(age_test, method = c("center", "scale")) 
+#This is the real test of the clock where you test using your test dataset
+
 testTransformed <- predict(preProcValues, age_test)
-testTransformed$Age <- as.numeric(testTransformed$Age)
+testTransformed$Age <- as.numeric(age_test$Age)
 
 
 print("Ridge")
-predict.ridge.test <- predict(ridge_model, testTransformed) 
+predict.ridge.test <- Finv(predict(ridge_model, testTransformed))
 postResample(pred = predict.ridge.test, testTransformed$Age) 
-cor.test(predict.ridge.test, testTransformed$Age)
+try(cor.test(predict.ridge.test, testTransformed$Age))
 
 print("Lasso")
-predict.lasso.test <- predict(lasso_model, testTransformed) 
+predict.lasso.test <- Finv(predict(lasso_model, testTransformed))
 postResample(pred = predict.lasso.test, testTransformed$Age) 
-cor.test(predict.lasso.test, testTransformed$Age)
+try(cor.test(predict.lasso.test, testTransformed$Age))
 
 print("Elastic")
-predict.elastic.test <- predict(elastic_model, testTransformed) 
+predict.elastic.test <- Finv(predict(elastic_model, testTransformed))
 postResample(pred = predict.elastic.test, testTransformed$Age) 
-cor.test(predict.elastic.test, testTransformed$Age)
+try(cor.test(predict.elastic.test, testTransformed$Age))
 
 print("Elastic.05")
-predict.elastic.05.test <- predict(elastic_model.05, testTransformed) 
+predict.elastic.05.test <- Finv(predict(elastic_model.05, testTransformed))
 postResample(pred = predict.elastic.05.test, testTransformed$Age) 
-cor.test(predict.elastic.05.test, testTransformed$Age)
+try(cor.test(predict.elastic.05.test, testTransformed$Age))
 
 
 
@@ -190,7 +254,6 @@ test_predictions_df<-rbind(test_predictions_df, cbind(Age=age_test$Age, Pred_age
 test_predictions_df$Age <- as.numeric(test_predictions_df$Age)
 test_predictions_df$Pred_age <- as.numeric(test_predictions_df$Pred_age)
 
-
 #Here we just create a dataset of mean methylation levels per sample, useful for plotting.
 #This can be skipped but good for exploratory analysis
 mean_per_sample<-plyr::ddply(meth.df, c("Age", "Sample"), function(x) mean(x$Methylation_level, na.rm=T) )
@@ -203,7 +266,8 @@ mean_per_sample$Age <- factor(mean_per_sample$Age , levels=c("0", "5", "10", "15
 
 mean_per_sample$Experiment <-ifelse(grepl("AL", mean_per_sample$Sample) | grepl("LI", mean_per_sample$Sample), "E2", "E1")
 
-                             
+
+
 #Predict age of wild samples (i.e. in our case neither training nor test samples)
 meth.df$Locus <- paste(meth.df$Chromosome, meth.df$Position, sep="_")
 
@@ -213,23 +277,35 @@ meth.final.wide<-dcast(meth.final, Age+Sample~Locus, value.var = "Methylation_le
 meth.final.impute<- na.aggregate(meth.final.wide[,3:ncol(meth.final.wide)])
 meth.final.impute$Age <- meth.final.wide$Age
 
-preProcValues <- preProcess(meth.final.impute, method = c("center", "scale")) 
-lwTransformed <- predict(preProcValues, meth.final.impute)
-lwTransformed$Age <- meth.final.impute$Age
 
+
+meth.final.predictors <- meth.final.impute[, setdiff(colnames(filteredDescr.cor), "Age")]
+
+
+lwTransformed <- predict(preProcValues, meth.final.predictors)
+
+lwTransformed$Age <- meth.final.impute$Age
 
 lwTransformed.LD<-lwTransformed[lwTransformed$Age == "long-distance",]
 lwTransformed.ME<-lwTransformed[lwTransformed$Age == "meconium",]
 
 
 
+LD.df <- data.frame(
+  Prediction = Finv(
+    predict(elastic_model, lwTransformed.LD)
+  )
+)
 
-LD.df<-as.data.frame(predict(elastic_model, lwTransformed.LD))
-colnames(LD.df)<-c("Prediction")
 LD.df$Age <- "LD"
 
-ME.df<-as.data.frame(predict(elastic_model, lwTransformed.ME))
-colnames(ME.df)<-c("Prediction")
+
+ME.df <- data.frame(
+  Prediction = Finv(
+    predict(elastic_model, lwTransformed.ME)
+  )
+)
+
 ME.df$Age <- "ME"
 
 #Here we create a data frame to output with relevant information
@@ -251,11 +327,11 @@ out.df$lm.adj.r.squared <- sumlmod$adj.r.squared
 
 #http://gettinggeneticsdone.blogspot.com/2011/01/rstats-function-for-extracting-f-test-p.html
 lmp <- function (modelobject) {
-    if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
-    f <- summary(modelobject)$fstatistic
-    p <- pf(f[1],f[2],f[3],lower.tail=F)
-    attributes(p) <- NULL
-    return(p)
+  if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
+  f <- summary(modelobject)$fstatistic
+  p <- pf(f[1],f[2],f[3],lower.tail=F)
+  attributes(p) <- NULL
+  return(p)
 }
 
 out.df$lm.p <- lmp(lmod)
@@ -266,12 +342,12 @@ test_predictions_df$Seed<-args[1]
 
 
 elastic_cl<-coef(elastic_model$finalModel, elastic_model$bestTune $lambda)
-  
+
 elastic_nonZero_coefs<-elastic_cl@Dimnames [[1]] [elastic_cl@i+1]
 
 #Here we create a data frame of sites included in the final model of the elastic net regression
 meth.df.elastic_nonZero <- meth.df[meth.df$Locus %in% elastic_nonZero_coefs , ]
-  
+
 
 meth.df.elastic_nonZero$Experiment <-ifelse(grepl("AL", meth.df.elastic_nonZero$Sample) | grepl("LI", meth.df.elastic_nonZero$Sample), "E2", "E1")
 meth.df.elastic_nonZero$Age <- ifelse(meth.df.elastic_nonZero$Age == "meconium", "ME", meth.df.elastic_nonZero$Age)
@@ -282,7 +358,7 @@ meth.df.elastic_nonZero$Seed <- args[1]
 
 
 
-save(elastic_model, file=paste(args[2], "/elastic.model.", args[1], ".rda", sep=""))
+#save(elastic_model, file=paste(args[2], "/elastic.model.", args[1], ".rda", sep=""))
 write.table(out.df, file = paste(args[2], "/out.df.", args[1], sep=""), quote = F, sep = "\t", row.names = T, col.names = F)
 write.table(test_predictions_df, file = paste(args[2], "/pred.df.", args[1], sep=""), quote = F, sep = "\t", row.names = F, col.names = F)
 write.table(meth.df.elastic_nonZero, file = paste(args[2], "/meth.df.elastic_nonZero.df.", args[1], sep=""), quote = F, sep = "\t", row.names = F, col.names = F)
