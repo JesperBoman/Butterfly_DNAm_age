@@ -12,6 +12,8 @@ A typical workflow is:
 4. Generate figures and statistical summaries using **plots_and_stats/**.
 5. Run isotope-based geolocation analyses from **isotope_geolocation/** if required.
 
+![alt text](https://github.com/JesperBoman/Butterfly_DNAm_age/blob/main/Butterfly_DNAm_age_github.jpg)
+
 ## Repository workflow
 
 ```mermaid
@@ -37,8 +39,6 @@ flowchart TD
 
 ```
 
-
-![alt text](https://github.com/JesperBoman/Butterfly_DNAm_age/blob/main/Butterfly_DNAm_age_github.jpg)
 
 **License**
 
