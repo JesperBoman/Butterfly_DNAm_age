@@ -14,3 +14,5 @@ A typical workflow is:
 
 
 ![alt text](https://github.com/JesperBoman/Butterfly_DNAm_age/blob/main/Butterfly_DNAm_age_github.jpg)
+
+This project is distributed under the terms of the license provided in the LICENSE file.
