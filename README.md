@@ -8,7 +8,7 @@ A typical workflow is:
 
 1. Process methylation sequencing data using scripts in **methylseq_pipe/**.
 2. Construct DNA methylation clocks using scripts in **analysis/**.
-3. Perform DMR analyses using scripts in **DMRs/.
+3. Perform DMR analyses using scripts in **DMRs/**.
 4. Generate figures and statistical summaries using **plots_and_stats/**.
 5. Run isotope-based geolocation analyses from **isotope_geolocation/** if required.
 
