@@ -50,8 +50,9 @@ flowchart LR
 
     A --> B
     B --> C
-    C --> D
-    D --> E
+    B --> D
+    D --> C
+    C --> E
     C --> F
     E --> F
     G --> H
