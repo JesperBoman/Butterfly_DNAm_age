@@ -28,6 +28,13 @@ flowchart TD
 
     F[Publication results<br/>Figures • Tables • Statistics]
 
+    A --> B
+    B --> C
+    B --> D
+    C --> D
+    D --> F
+    E --> F
+
 ```
 
 
