@@ -14,7 +14,7 @@ A typical workflow is:
 
 ![alt text](https://github.com/JesperBoman/Butterfly_DNAm_age/blob/main/Butterfly_DNAm_age_github.jpg)
 
-## Repository workflow
+
 
 ## Repository structure and analytical workflow
 
