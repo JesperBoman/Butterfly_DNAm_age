@@ -22,7 +22,7 @@
 | `earlyStudySamples_and_age_list.txt` | Boman et al. 2023 sample metadata.         |
 | `example_input_data.txt`             | Example analysis input.                    |
 | `R_sessionInfo_seed_clock.txt`       | R session information for reproducibility. |
-
+| `R_sessionInfo_topGO.txt`            | R session information for reproducibility. |
 
 
 **Data preparation**
