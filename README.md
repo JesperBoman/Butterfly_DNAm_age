@@ -23,27 +23,23 @@ flowchart LR
 
     A[Raw bisulfite sequencing data]
 
-    B[methylseq_pipe
+    B[methylseq_pipe/
     Read processing and
     methylation calling]
 
-    C[analysis
+    C[analysis/
     Epigenetic clock
     construction]
 
-    D[DMRs
+    D[DMRs/
     Differentially methylated
     region analyses]
 
-    E[topGO
-    Functional enrichment
-    analyses]
-
-    F[plots_and_stats
+    F[plots_and_stats/
     Manuscript figures and
     statistical summaries]
 
-    G[isotope_geolocation
+    G[isotope_geolocation/
     Geographic origin analyses]
 
     H[Final manuscript results]
@@ -52,9 +48,7 @@ flowchart LR
     B --> C
     B --> D
     D --> C
-    C --> E
     C --> F
-    E --> F
     G --> H
     F --> H
 ```
