@@ -1,3 +1,11 @@
+| File                           | Description                                        |
+| ------------------------------ | -------------------------------------------------- |
+| `DMR_analysis_step1.R`         | Initial DMR identification workflow.               |
+| `DMR_analysis_findDMRs.R`      | DMR detection and summarisation.                   |
+| `DMR_analysis_top_epiClock.sh` | Master workflow script.                            |
+| `DMR_prep.sh`                  | Preparation of input files for DMR analyses.       |
+
+
 This is a pipeline to call differentially methylated regions (DMRs).
 
 It uses the R package [bsseq](https://www.bioconductor.org/packages/devel/bioc/vignettes/bsseq/inst/doc/bsseq.html) and the [BSmooth method](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2012-13-10-r83).
