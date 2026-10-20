@@ -1,5 +1,6 @@
 **Varying seed clock pipeline**
 
+Main contents
 | File                                               | Description                                     |
 | -------------------------------------------------- | ----------------------------------------------- |
 | `master.clocksmith.sh`                             | Master workflow for epigenetic clock analyses.  |
@@ -13,6 +14,15 @@
 | `varying_seed_GO_prep_*.sh`                        | Preparation scripts for GO enrichment analyses. |
 | `add_E2_data.sh`                                   | Data integration utility.                       |
 | `comb_data.sh`                                     | Combines analysis datasets.                     |
+
+Supporting files
+| File                                 | Purpose                                    |
+| ------------------------------------ | ------------------------------------------ |
+| `samples_info.txt`                   | Sample metadata.                           |
+| `earlyStudySamples_and_age_list.txt` | Age information for study samples.         |
+| `example_input_data.txt`             | Example analysis input.                    |
+| `R_sessionInfo_seed_clock.txt`       | R session information for reproducibility. |
+
 
 
 **Data preparation**
