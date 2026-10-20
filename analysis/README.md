@@ -1,6 +1,6 @@
 **Varying seed clock pipeline**
 
-Main contents
+**Main contents**
 | File                                               | Description                                     |
 | -------------------------------------------------- | ----------------------------------------------- |
 | `master.clocksmith.sh`                             | Master workflow for epigenetic clock analyses.  |
@@ -15,11 +15,11 @@ Main contents
 | `add_E2_data.sh`                                   | Data integration utility.                       |
 | `comb_data.sh`                                     | Combines analysis datasets.                     |
 
-Supporting files
+**Supporting files**
 | File                                 | Purpose                                    |
 | ------------------------------------ | ------------------------------------------ |
 | `samples_info.txt`                   | Sample metadata.                           |
-| `earlyStudySamples_and_age_list.txt` | Age information for study samples.         |
+| `earlyStudySamples_and_age_list.txt` | Boman et al. 2023 sample metadata.         |
 | `example_input_data.txt`             | Example analysis input.                    |
 | `R_sessionInfo_seed_clock.txt`       | R session information for reproducibility. |
 
