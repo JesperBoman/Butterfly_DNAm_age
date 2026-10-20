@@ -7,7 +7,9 @@
 | `64genes_500plusSeeds_chromosome_distribution.R` | Chromosomal distribution analyses of candidate loci.              |
 
 **Supporting files**
-| File                             | Purpose                                |
-| -------------------------------- | -------------------------------------- |
-| `sample_sex_map.txt`             | Sex information for samples.           |
-| `vs_geneID_and_loci_counts.list` | Gene and locus annotation information. |
+| File                                       | Purpose                                |
+| ------------------------------------------ | -------------------------------------- |
+| `sample_sex_map.txt`                       | Sex information for samples.           |
+| `vs_geneID_and_loci_counts.list`           | Gene and locus annotation information. |
+| `R_sessionInfo_varseed_plot_and_stats.txt` | R session info for reproducibility.    |
+
