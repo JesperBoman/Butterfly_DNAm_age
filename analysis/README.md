@@ -5,8 +5,8 @@
 | `master.clocksmith.sh`                             | Master workflow for epigenetic clock analyses.  |
 | `fancier_varying_seed_clock5_F.R`                  | Main DNAm age model generation script.          |
 | `fancier_varying_seed_clock5_F_SUBSAMPLE.R`        | Subsampling version of clock construction.      |
-| `fancier_varying_seed_clock5_F_WCLOCK.R`           | Weighted-clock implementation.                  |
-| `fancier_varying_seed_clock5_F_WCLOCK_SUBSAMPLE.R` | Weighted-clock analysis with subsampling.       |
+| `fancier_varying_seed_clock5_F_WCLOCK.R`           | Wild-clock implementation.                  |
+| `fancier_varying_seed_clock5_F_WCLOCK_SUBSAMPLE.R` | Wild-clock analysis with subsampling.       |
 | `smither.sh`                                       | Helper script for running clock analyses.       |
 | `smither_SUBSAMPLE.sh`                             | Subsampling workflow helper.                    |
 | `topGO.R`                                          | GO enrichment analyses of age-associated loci.  |
