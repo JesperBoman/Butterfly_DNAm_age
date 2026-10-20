@@ -12,6 +12,24 @@ A typical workflow is:
 4. Generate figures and statistical summaries using **plots_and_stats/**.
 5. Run isotope-based geolocation analyses from **isotope_geolocation/** if required.
 
+## Repository workflow
+
+```mermaid
+flowchart TD
+    A[methylseq_pipe<br/>Methylation sequencing processing]
+
+    B[analysis<br/>Epigenetic clock construction<br/>and age prediction]
+
+    C[DMRs<br/>Differentially methylated<br/>region analyses]
+
+    D[plots_and_stats<br/>Statistical analyses<br/>and manuscript figures]
+
+    E[isotope_geolocation<br/>Stable isotope-based<br/>geolocation analyses]
+
+    F[Publication results<br/>Figures • Tables • Statistics]
+
+```
+
 
 ![alt text](https://github.com/JesperBoman/Butterfly_DNAm_age/blob/main/Butterfly_DNAm_age_github.jpg)
 
