@@ -16,27 +16,46 @@ A typical workflow is:
 
 ## Repository workflow
 
+## Repository structure and analytical workflow
+
 ```mermaid
-flowchart TD
-    A[methylseq_pipe<br/>Methylation sequencing processing]
+flowchart LR
 
-    B[analysis<br/>Epigenetic clock construction<br/>and age prediction]
+    A[Raw bisulfite sequencing data]
 
-    C[DMRs<br/>Differentially methylated<br/>region analyses]
+    B[methylseq_pipe
+    Read processing and
+    methylation calling]
 
-    D[plots_and_stats<br/>Statistical analyses<br/>and manuscript figures]
+    C[analysis
+    Epigenetic clock
+    construction]
 
-    E[isotope_geolocation<br/>Stable isotope-based<br/>geolocation analyses]
+    D[DMRs
+    Differentially methylated
+    region analyses]
 
-    F[Publication results<br/>Figures • Tables • Statistics]
+    E[topGO
+    Functional enrichment
+    analyses]
+
+    F[plots_and_stats
+    Manuscript figures and
+    statistical summaries]
+
+    G[isotope_geolocation
+    Geographic origin analyses]
+
+    H[Final manuscript results]
 
     A --> B
     B --> C
-    B --> D
     C --> D
-    D --> F
+    D --> E
+    C --> F
     E --> F
-
+    G --> H
+    F --> H
 ```
 
 
