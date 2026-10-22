@@ -2,7 +2,7 @@
 
 This repository contains code related to the publication "An epigenetic aging clock in butterflies".
 
-10.1098/rspb.xxxx.xxxx (to be updated)
+DOI: 10.1098/rspb.2026.1679
 
 A typical workflow is:
 
