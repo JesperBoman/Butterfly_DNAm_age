@@ -1,3 +1,6 @@
+
+[![DOI](https://zenodo.org/badge/1048927647.svg)](https://doi.org/10.5281/zenodo.23561348)
+
 # Butterfly_DNAm_age
 
 This repository contains code related to the publication "An epigenetic aging clock in butterflies".
