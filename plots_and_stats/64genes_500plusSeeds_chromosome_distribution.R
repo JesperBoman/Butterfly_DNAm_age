@@ -15,15 +15,23 @@ setwd("~/Downloads")
 #cds.length.per.chr <- read.table("total_cds_length_per_chromosome.txt")
 
 #The total CDS length and the number of CpGs on CDSs per chromosome
-cds.length.per.chr <- read.table(file=file.choose(), header=T)
+cds.length.per.chr <- read.table(file=file.choose(), header=F)
+colnames(cds.length.per.chr)<-c("Chromosome", "CpG_bases")
 
 
-twentyfourgenes<-read.table(file=file.choose(), header=T) #Table_S2_24genes_atLeast500seeds_replicate_positions_removed
-twentyfourgenes.counts<-as.data.frame(table(twentyfourgenes$Chromosome))
+genes<-read.table(file=file.choose(), header=T) #Table_S2_loci
 
-colnames(twentyfourgenes.counts) <- c("Chromosome", "Observed")
+length(unique(genes$Annotation_gene_name)) #64 genes
 
-cont.df<-merge(cds.length.per.chr, twentyfourgenes.counts, by="Chromosome", all.x=T)
+#Check for duplicated positions (can occur in two different genes)
+duplicated(genes[,3:4])
+
+genes <- genes[!duplicated(genes[c("Chromosome", "Position")]), ] #Only 56 genes remain after this step
+genes.counts<-as.data.frame(table(genes$Chromosome))
+
+colnames(genes.counts) <- c("Chromosome", "Observed")
+
+cont.df<-merge(cds.length.per.chr, genes.counts, by="Chromosome", all.x=T)
 
 head(cont.df)
 
@@ -41,6 +49,3 @@ pchisq(chi2, df=degrees.of.freedom, lower.tail=F)
 chisq.test(x = cont.df$Observed,
            p = cont.df$Expected / sum(cont.df$Expected),
            rescale.p = TRUE)
-#p ≈ 1.25e-14 if using CDS length
-#P ≈ 1.79e-13 if using the number of CpGs per CDS
-#These values are very similar meaning that there is not much difference
