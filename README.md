@@ -1,5 +1,5 @@
 
-[![DOI](https://zenodo.org/badge/1048927647.svg)](https://doi.org/10.5281/zenodo.23561348)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23667421.svg)](https://doi.org/10.5281/zenodo.23667421)
 
 # Butterfly_DNAm_age
 
