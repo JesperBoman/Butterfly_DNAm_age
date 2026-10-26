@@ -7,6 +7,8 @@
   # From each, estimates of the  minimum distance-traveled and maximum distance
   # traveled are calculated.
 # comments: run in R version 4.5.1
+#updated October 26, 2026
+
 # Sr Isoscape manuscript citation:
 #   Reich, M. S., Ghouri, S., Zabudsky, S., Hu, L., Le Corre, M., Ng’iru, I., Benyamini, D., Shipilina, D., Collins, S. C., Martins, D. J., Vila, R., Talavera, G., & Bataille, C. P. (2024). Trans-Saharan migratory patterns in Vanessa cardui and evidence for a southward leapfrog migration. iScience, 27(12), 111342. https://doi.org/10.1016/j.isci.2024.111342
 #
@@ -20,7 +22,7 @@
 #   Talavera, G., García-Berro, A., Talla, V. N. K., Ng’iru, I., Bahleman, F., Kébé, K., Nzala, K. M., Plasencia, D., Marafi, M. A. J., Kassie, A., Goudégnon, E. O. A., Kiki, M., Benyamini, D., Reich, M. S., López-Mañas, R., Benetello, F., Collins, S. C., Bataille, C. P., Pierce, N. E., … Vila, R. (2023). The Afrotropical breeding grounds of the Palearctic-African migratory painted lady butterflies (Vanessa cardui). Proceedings of the National Academy of Sciences, 120(16), e2218280120. https://doi.org/10.1073/pnas.2218280120
 
 # download package if missing
-list.of.packages <- c("tidyverse","osfr", "assignR", "terra",  "sf", "geosphere", "tidyterra","spatialEco""ggspatial","raster")
+list.of.packages <- c("tidyverse","osfr", "assignR", "terra",  "sf", "geosphere", "tidyterra","spatialEco","ggspatial","raster")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
@@ -53,10 +55,12 @@ unknown2<- unknown %>%
 # download isoscapes from OSF (Reich et al 2024)
 proj <- osf_retrieve_node("dzh2g")
 dir.create("isotope_geolocation/data_osf_dzh2g")
-proj %>%
-  osf_ls_files() %>%
-  filter(name=="isoscapes") %>%
-  osf_download(path="isotope_geolocation/data_osf_dzh2g", conflicts="overwrite")
+osfiso <- osf_ls_files(proj, n_max = Inf) %>%
+  filter(tolower(trimws(name)) == "isoscapes")
+osf_download(osfiso,
+             path = "isotope_geolocation/data_osf_dzh2g",
+             recurse = TRUE,          # include files inside the folder and any subfolders
+             conflicts = "overwrite")
 
 # import isoscapes
 rf_sr<-rast("isotope_geolocation/data_osf_dzh2g/isoscapes/Sr_mlr_mean_c.tif")
@@ -392,7 +396,7 @@ i128_plot <-ggplot()+
 ggsave(plot=i128_plot, filename=paste0("isotope_geolocation/output/19H128_plot.png"), device="png", height=4, width=4, units="in",bg="white")
 
 # distance metrics ####
-metrics <- data.frame(ID=NA,capx=NA,capy=NA, HSr_local=NA,HSr_distmin=NA, HSr_distminy=NA, HSr_distminy=NA, HSr_distmax=NA, HSr_distcentx=NA, HSr_distcenty=NA, HSr_area=NA,HSr_per=NA)[numeric(0), ]
+metrics <- data.frame(ID=NA,capx=NA,capy=NA, HSr_local=NA,HSr_distmin=NA, HSr_distminx=NA, HSr_distminy=NA, HSr_distmax=NA, HSr_distcentx=NA, HSr_distcenty=NA, HSr_area=NA,HSr_per=NA)[numeric(0), ]
 
 for(k in 1:nrow(unknown2)){
   ind<-unknown2[k,]
@@ -423,9 +427,13 @@ for(k in 1:nrow(unknown2)){
   #minimum distance from capture point to polygon
   pol <- terra::project(lin, capxy)
   pol_sf <- sf::st_as_sf(pol)
-  pol_sp <- as(pol, "Spatial")
-  dist_min <- geosphere::dist2Line(p = c(ind$Lon[1], ind$Lat[1]), line = pol_sp, distfun=distHaversine)
-  #get vertices of polygon
+  bnd <- sf::st_union(sf::st_boundary(pol_sf))         # polygon edge, all parts combined
+  seg <- sf::st_nearest_points(capxy, bnd)             # line from capture point to nearest edge
+  nearpt <- sf::st_coordinates(seg)[2, c("X", "Y")]    # lon/lat of that nearest point
+  dmin <- as.numeric(sf::st_distance(capxy, bnd))      # metres
+  # pol_sp <- as(pol, "Spatial")
+  # dist_min <- geosphere::dist2Line(p = c(ind$Lon[1], ind$Lat[1]), line = pol_sp, distfun=distHaversine)
+  # #get vertices of polygon
   vertices <- spatialEco::extract.vertices(x = pol_sf, join=F)
   vertices_sf <- sf::st_as_sf(vertices)
   st_crs(vertices_sf) <- 4326
@@ -437,9 +445,9 @@ for(k in 1:nrow(unknown2)){
                      capx=ind$Lon,
                      capy=ind$Lat, #coord of capture site in WGS84
                      HSr_local=local$layer, #is capture location in 2:1 odds ratio area?
-                     HSr_distmin=dist_min[1]/1000,
-                     HSr_distminx=dist_min[2],
-                     HSr_distminy=dist_min[3],
+                     HSr_distmin  = dmin/1000,
+                     HSr_distminx = nearpt[1],
+                     HSr_distminy = nearpt[2],
                      HSr_distmax=maximumd,
                      HSr_distcentx=cent_df[3],
                      HSr_distcenty=cent_df[4],
@@ -456,3 +464,38 @@ left_join(metrics %>%
       dplyr::select(ID, HSr_distmin, HSr_distmax), by = c("Sample_ID" = "ID"))
 print(tableS4)
 write.csv(metrics, file = "isotope_geolocation/output/TableS4.csv")
+
+sessionInfo()
+# R version 4.5.1 (2025-06-13 ucrt)
+# Platform: x86_64-w64-mingw32/x64
+# Running under: Windows 11 x64 (build 26200)
+#
+# Matrix products: default
+# LAPACK version 3.12.1
+#
+# locale:
+#   [1] LC_COLLATE=English_Canada.utf8  LC_CTYPE=English_Canada.utf8    LC_MONETARY=English_Canada.utf8 LC_NUMERIC=C
+# [5] LC_TIME=English_Canada.utf8
+#
+# time zone: Australia/Sydney
+# tzcode source: internal
+#
+# attached base packages:
+#   [1] stats     graphics  grDevices utils     datasets  methods   base
+#
+# other attached packages:
+#   [1] ggspatial_1.1.10   tidyterra_0.7.2    spatialEco_2.0-3   geosphere_1.5-20   raster_3.6-32      sp_2.2-0
+# [7] sf_1.0-21          assignR_2.4.3.9000 terra_1.8-70       osfr_0.2.9         lubridate_1.9.4    forcats_1.0.1
+# [13] stringr_1.5.2      dplyr_1.1.4        purrr_1.1.0        readr_2.1.5        tidyr_1.3.1        tibble_3.3.0
+# [19] ggplot2_4.0.0      tidyverse_2.0.0
+#
+# loaded via a namespace (and not attached):
+#   [1] gtable_0.3.6       lattice_0.22-7     tzdb_0.5.0         vctrs_0.6.5        tools_4.5.1        generics_0.1.4
+# [7] curl_7.0.0         proxy_0.4-27       pkgconfig_2.0.3    KernSmooth_2.23-26 data.table_1.17.8  RColorBrewer_1.1-3
+# [13] S7_0.2.0           lifecycle_1.0.5    compiler_4.5.1     farver_2.1.2       textshaping_1.0.4  codetools_0.2-20
+# [19] class_7.3-23       pillar_1.11.1      classInt_0.4-11    cachem_1.1.0       wk_0.9.4           tidyselect_1.2.1
+# [25] stringi_1.8.7      fastmap_1.2.0      grid_4.5.1         cli_3.6.5          magrittr_2.0.4     utf8_1.2.6
+# [31] triebeard_0.4.1    crul_1.6.0         e1071_1.7-16       withr_3.0.2        scales_1.4.0       timechange_0.3.0
+# [37] httr_1.4.7         ragg_1.5.0         hms_1.1.4          mvnfast_0.2.8      memoise_2.0.1      s2_1.1.9
+# [43] urltools_1.7.3.1   rlang_1.1.6        Rcpp_1.1.0         glue_1.8.0         DBI_1.2.3          httpcode_0.3.0
+# [49] rstudioapi_0.19.0  jsonlite_2.0.0     R6_2.6.1           systemfonts_1.3.1  fs_1.6.6           units_1.0-0

@@ -2,11 +2,13 @@ Readme file
 
 author: Megan Reich
 date: October 2025
+updated: October 2026 (see isotope_script.R notes)
 contact: meganreich13@gmail.com; mreich@uottawa.ca
 folder: isotope_geolocation
 
 file: isotope_script.R
 	description: R script to apply hydrogen and strontium isotope-based geographic assignment, combined with a monthly species distribution model, to estimate  the natal origin of 5 painted lady butterflies captured in Benin and Senegal. From each, estimates of the  minimum distance-traveled and maximum distance traveled are calculated.
+	update (Oct 2026): fixed isoscape download from OSF, updated distance metrics code to updated terra and sf packages (this may result in small changes to calculated HSR_distmin), added Session Information
 	non-package data references:
 	  Sr Isoscape manuscript citation: Reich, M. S., Ghouri, S., Zabudsky, S., Hu, L., Le Corre, M., Ng’iru, I., Benyamini, D., Shipilina, D., Collins, S. C., Martins, D. J., Vila, R., Talavera, G., & Bataille, C. P. (2024). Trans-Saharan migratory patterns in Vanessa cardui and evidence for a southward leapfrog migration. iScience, 27(12), 111342. https://doi.org/10.1016/j.isci.2024.111342
     Sr Isoscape data citation and location: Reich, M. S., Ghouri, S., Zabudsky, S., Hu, L., Le Corre, M., Ng’iru, I., … bataille, clement. (2024, October 30). Isotope geolocation. Retrieved from osf.io/rnfmp
