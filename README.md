@@ -17,7 +17,7 @@ A typical workflow is:
 4. Generate figures and statistical summaries using **plots_and_stats/**.
 5. Run isotope-based geolocation analyses from **isotope_geolocation/** if required.
 
-![alt text](https://github.com/JesperBoman/Butterfly_DNAm_age/blob/main/Butterfly_DNAm_age_github2.jpg)
+![alt text](https://github.com/JesperBoman/Butterfly_DNAm_age/blob/main/Butterfly_DNAm_age_github_noTitle.jpg)
 
 
 
