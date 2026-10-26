@@ -3,7 +3,9 @@
 
 # Butterfly_DNAm_age
 
-This repository contains code related to the publication "An epigenetic aging clock in butterflies".
+This repository contains code related to the publication:
+
+## An epigenetic aging clock in butterflies 
 
 DOI: 10.1098/rspb.2026.1679
 
